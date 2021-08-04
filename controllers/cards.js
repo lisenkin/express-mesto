@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
@@ -30,15 +29,12 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (card) {
-        res.send({ message: 'Карточка удалена' });
-      } else {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      }
-    })
+    .orFail(new Error('Not Found'))
+    .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'Not Found') {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -53,15 +49,12 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: owner } },
     { new: true },
   )
-    .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      }
-    })
+    .orFail(new Error('Not Found'))
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'Not Found') {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -76,15 +69,12 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: owner } },
     { new: true },
   )
-    .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      }
-    })
+    .orFail(new Error('Not Found'))
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'Not Found') {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });

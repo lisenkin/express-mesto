@@ -2,17 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { usersRoute } = require('./routes/users');
 const { cardsRoute } = require('./routes/cards');
+const { notFoundRoute } = require('./routes/notFound');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(express.json()); // rrquest body parser
-
-// заглушка для стартовой
-
-app.get('/', (req, res) => {
-  res.send('welkommen');
-});
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -31,6 +26,7 @@ app.use((req, res, next) => {
 
 app.use('/users', usersRoute);
 app.use('/cards', cardsRoute);
+app.use('*', notFoundRoute); // not found
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
