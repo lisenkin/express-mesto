@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
-const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const { usersRoute } = require('./routes/users');
@@ -16,9 +15,7 @@ const { validateSignUp, validateSignIn } = require('./middlewares/validation');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(cookieParser());
-
-app.use(express.json()); // rrquest body parser
+app.use(express.json()); // request body parser
 
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -31,16 +28,17 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 /*
 app.use((req, res, next) => {
   req.user = {
-    _id: '610832fe16f50d0693f05977', // это айдишник первой записи (после тестов, кучи кривых и снесения всего до нуля)
+    _id: '610832fe16f50d0693f05977',
+     // это айдишник первой записи (после тестов, кучи кривых и снесения всего до нуля)
   };
 
   next();
 }); */
-
+// добавим авторизацию и валидацию
 app.post('/signin', validateSignIn, login);
 app.post('/signup', validateSignUp, createUser);
-app.use('/users', usersRoute);
-app.use('/cards', cardsRoute);
+app.use('/users', auth, usersRoute);
+app.use('/cards', auth, cardsRoute);
 app.use('*', notFoundRoute); // not found
 
 app.use(errors());
