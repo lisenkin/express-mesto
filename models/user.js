@@ -1,4 +1,7 @@
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const UnauthorizedErr = require('../errors/UnauthorizedErr');
 // весь день копалась почему не работает.
 
 const userSchema = new mongoose.Schema({
@@ -29,7 +32,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
-      message: 'Некорректный адрес электроной почты',require_protocol: true
+      message: 'Некорректный адрес электроной почты',
     },
   },
   password: {
@@ -38,18 +41,18 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
-//проверка
+// проверка
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
+        return Promise.reject(new UnauthorizedErr('Неправильная почта или пароль'));
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
+            return Promise.reject(new UnauthorizedErr('Неправильная почта или пароль'));
           }
           return user;
         });
