@@ -6,14 +6,15 @@ const cardSchema = new mongoose.Schema({
     minlengtn: 2,
     maxlength: 30,
     required: true,
-    validate: {
-      validator: (link) => /^(https?:\/\/)?([\w-]+\.[\w-]+)\S*$/.test(link),
-      message: 'Некорректная ссылка',
-    },
+
   },
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (link) => /^(https?:\/\/)?([\w-]+\.[\w-]+)\S*$/.test(link),
+      message: 'Некорректная ссылка', require_protocol: true
+    },
   },
   owner: {
     required: true,
