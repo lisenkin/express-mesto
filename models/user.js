@@ -2,7 +2,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const UnauthorizedErr = require('../errors/UnauthorizedErr');
-// весь день копалась почему не работает.
+// извиняюсь, почему-то на ревью ушла не финальная версия с гита :(
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -41,8 +41,11 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
-// проверка
-userSchema.statics.findUserByCredentials = function (email, password) {
+
+// проверка  на 401 (я извиняюсь за косяки в предыдущей версии,
+// половина правок почему-то не залились на гит
+
+userSchema.statics.findUserByCredentials = function (email, password) { // eslint-disable-line
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {

@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const UnauthorizedErr = require('../errors/UnauthorizedErr');
 const NotFoundErr = require('../errors/NotFoundErr');
 const BadRequestErr = require('../errors/BadRequestErr');
 const ConflictErr = require('../errors/ConflictErr');
@@ -117,6 +118,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       }
     });
 };
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -130,5 +132,5 @@ module.exports.login = (req, res, next) => {
           sameSite: true,
         }).send({ message: 'Вход выполнен' });
     })
-    .catch(next);
+    .catch(() => next(new UnauthorizedErr()));
 };
