@@ -5,11 +5,12 @@ require('dotenv').config();
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { usersRoute } = require('./routes/users');
 const { cardsRoute } = require('./routes/cards');
 const { notFoundRoute } = require('./routes/notFound');
 
-const { login, createUser } = require('./controllers/users');
+const { login, createUser, signOut } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { validateSignUp, validateSignIn } = require('./middlewares/validation');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -17,6 +18,12 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+app.use(cors({
+  origin: 'https://mesto.lisena.nomoredomains.club',
+  credentials: true,
+}));
+
+app.use(cookieParser());
 app.use(express.json()); // request body parser
 
 app.use(helmet());
@@ -26,28 +33,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-
-const allowedCors = [
-  'https://api.mesto.lisena.nomoredomains.monster',
-  'http://api.mesto.lisena.nomoredomains.monster',
-  'https://mesto.lisena.nomoredomains.work',
-  'http://mesto.lisena.nomoredomains.work',
-  'localhost:3000',
-];
-
-app.use(
-  helmet(),
-  cors({
-    credentials: true,
-    origin(origin, callback) {
-      if (allowedCors.includes(origin) || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-  }),
-);
 
 // добавим логгер
 app.use(requestLogger);
@@ -63,6 +48,7 @@ app.use(errorLogger);
 app.options('*', cors());
 
 app.use(errors());
+app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
