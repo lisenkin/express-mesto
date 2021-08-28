@@ -19,7 +19,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(cors({
-  origin: 'https://mesto.lisena.nomoredomains.club',
+  origin: 'https://mesto.lisena.nomoredomains.work',
   credentials: true,
 }));
 
