@@ -134,3 +134,6 @@ module.exports.login = (req, res, next) => {
     })
     .catch(() => next(new UnauthorizedErr()));
 };
+module.exports.signOut = (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход выполнен' });
+};
