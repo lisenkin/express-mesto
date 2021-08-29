@@ -10,7 +10,7 @@ const { usersRoute } = require('./routes/users');
 const { cardsRoute } = require('./routes/cards');
 const { notFoundRoute } = require('./routes/notFound');
 
-const { login, createUser, signOut } = require('./controllers/users');
+const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { validateSignUp, validateSignIn } = require('./middlewares/validation');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -18,10 +18,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(cors({
-  origin: 'https://mesto.lisena.nomoredomains.work',
-  credentials: true,
-}));
+app.use(cors({ credentials: true, origin: true }));
 
 app.use(cookieParser());
 app.use(express.json()); // request body parser
@@ -35,7 +32,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 // добавим логгер
-app.use(requestLogger);
+//app.use(requestLogger);
 
 // добавим авторизацию и валидацию
 app.post('/signin', validateSignIn, login);
@@ -44,11 +41,11 @@ app.use('/users', auth, usersRoute);
 app.use('/cards', auth, cardsRoute);
 app.use('*', notFoundRoute); // not found
 
-app.use(errorLogger);
-app.options('*', cors());
+//app.use(errorLogger);
+//app.options('*', cors());
 
 app.use(errors());
-app.use(errorLogger);
+//app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
